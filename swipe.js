@@ -1,3 +1,19 @@
+
+switch(navigator.appName)
+{
+case "Netscape":
+  x= 'webkitTransitionEnd';
+  break;
+case "Opera":
+  x= 'oTransitionEnd';
+  break;
+case "Msie":
+  x= 'msTransitionEnd';
+  break;
+default:
+  x= 'transitionend';
+}
+
 /*
  * Swipe 1.0
  *
@@ -39,10 +55,7 @@ window.Swipe = function(element, options) {
     this.element.addEventListener('touchstart', this, false);
     this.element.addEventListener('touchmove', this, false);
     this.element.addEventListener('touchend', this, false);
-    this.element.addEventListener('webkitTransitionEnd', this, false);
-    this.element.addEventListener('msTransitionEnd', this, false);
-    this.element.addEventListener('oTransitionEnd', this, false);
-    this.element.addEventListener('transitionend', this, false);
+    this.element.addEventListener(x, this, false);
     window.addEventListener('resize', this, false);
   }
 
@@ -91,11 +104,12 @@ Swipe.prototype = {
     var style = this.element.style;
 
     // set duration speed (0 represents 1-to-1 scrolling)
-    style.webkitTransitionDuration = style.MozTransitionDuration = style.msTransitionDuration = style.OTransitionDuration = style.transitionDuration = duration + 'ms';
+    style[x] = duration + 'ms';
 
     // translate to given index position
-    style.webkitTransform = 'translate3d(' + -(index * this.width) + 'px,0,0)';
-    style.msTransform = style.MozTransform = style.OTransform = 'translateX(' + -(index * this.width) + 'px)';
+    if(x=="Netscape")
+    {style.webkitTransform = 'translate3d(' + -(index * this.width) + 'px,0,0)';}
+    else {style[x] = 'translateX(' + -(index * this.width) + 'px)';}
 
     // set new index to allow for expression arguments
     this.index = index;
@@ -158,10 +172,7 @@ Swipe.prototype = {
       case 'touchstart': this.onTouchStart(e); break;
       case 'touchmove': this.onTouchMove(e); break;
       case 'touchend': this.onTouchEnd(e); break;
-      case 'webkitTransitionEnd':
-      case 'msTransitionEnd':
-      case 'oTransitionEnd':
-      case 'transitionend': this.transitionEnd(e); break;
+      case x : this.transitionEnd(e); break;
       case 'resize': this.setup(); break;
     }
   },
@@ -194,7 +205,7 @@ Swipe.prototype = {
     this.deltaX = 0;
 
     // set transition time to 0 for 1-to-1 touch movement
-    this.element.style.webkitTransitionDuration = 0;
+    this.element.style[x] = 0;
 
   },
 
@@ -230,7 +241,7 @@ Swipe.prototype = {
           : 1 );                                          // no resistance if false
       
       // translate immediately 1-to-1
-      this.element.style.webkitTransform = 'translate3d(' + (this.deltaX - this.index * this.width) + 'px,0,0)';
+      this.element.style[o] = 'translate3d(' + (this.deltaX - this.index * this.width) + 'px,0,0)';
 
     }
 
